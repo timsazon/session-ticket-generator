@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using Steamworks;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SessionTicketGenerator
@@ -22,10 +23,17 @@ namespace SessionTicketGenerator
                   {
                       SteamClient.Init(o.AppId);
                       var ticket = await SteamUser.GetAuthSessionTicketAsync();
-                      SteamClient.Shutdown();
 
-                      var hexTicket = BitConverter.ToString(ticket.Data).Replace("-", "");
-                      Console.WriteLine($"Session ticket = {hexTicket}");
+                      var hex = new StringBuilder(ticket.Data.Length * 2);
+                      foreach (byte b in ticket.Data)
+                          hex.AppendFormat("{0:x2}", b);
+
+                      Console.WriteLine($"Session ticket = {hex}");
+
+                      Console.WriteLine($"Press any key to cancel the ticket...");
+                      Console.ReadKey();
+
+                      SteamClient.Shutdown();
                   });
         }
     }
